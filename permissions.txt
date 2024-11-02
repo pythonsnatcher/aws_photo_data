@@ -1,0 +1,159 @@
+lambda_public:
+
+arn:aws:s3:::<PLACEHOLDER_BUCKET>/*
+Allow: s3:GetObject
+Allow: s3:ListBucket
+Allow: s3:DeleteObject
+
+\
+
+lambda_private:
+s3:*
+Allow: All resources
+sns:*
+Allow: All resources
+
+
+\
+
+s3_public:
+  bucket_policy:
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "AllowPublicAccesstoObjects",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::<PLACEHOLDER_BUCKET>/*"
+        },
+        {
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::<PLACEHOLDER_BUCKET>/*"
+        },
+        {
+            "Sid": "AllowAmplifyToListPrefix_<PLACEHOLDER>_staging_",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "amplify.amazonaws.com"
+            },
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::<PLACEHOLDER_BUCKET>",
+            "Condition": {
+                "StringEquals": {
+                    "aws:SourceArn": "arn%3Aaws%3Aamplify%3A<PLACEHOLDER_REGION>%3A<PLACEHOLDER_ACCOUNT>%3Aapps%2F<PLACEHOLDER_APP>%2Fbranches%2Fstaging",
+                    "s3:prefix": "",
+                    "aws:SourceAccount": "<PLACEHOLDER_ACCOUNT>"
+                }
+            }
+        },
+        {
+            "Sid": "AllowAmplifyToReadPrefix_<PLACEHOLDER>_staging_",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "amplify.amazonaws.com"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::<PLACEHOLDER_BUCKET>/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:SourceArn": "arn%3Aaws%3Aamplify%3A<PLACEHOLDER_REGION>%3A<PLACEHOLDER_ACCOUNT>%3Aapps%2F<PLACEHOLDER_APP>%2Fbranches%2Fstaging",
+                    "aws:SourceAccount": "<PLACEHOLDER_ACCOUNT>"
+                }
+            }
+        },
+        {
+            "Effect": "Deny",
+            "Principal": "*",
+            "Action": "s3:*",
+            "Resource": "arn:aws:s3:::<PLACEHOLDER_BUCKET>/*",
+            "Condition": {
+                "Bool": {
+                    "aws:SecureTransport": "false"
+                }
+            }
+        },
+        {
+            "Sid": "AllowAmplifyToListPrefix_<PLACEHOLDER>_staging_",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "amplify.amazonaws.com"
+            },
+            "Action": "s3:ListBucket",
+            "Resource": "arn:aws:s3:::<PLACEHOLDER_BUCKET>",
+            "Condition": {
+                "StringEquals": {
+                    "aws:SourceArn": "arn%3Aaws%3Aamplify%3A<PLACEHOLDER_REGION>%3A<PLACEHOLDER_ACCOUNT>%3Aapps%2F<PLACEHOLDER_APP>%2Fbranches%2Fstaging",
+                    "s3:prefix": "",
+                    "aws:SourceAccount": "<PLACEHOLDER_ACCOUNT>"
+                }
+            }
+        },
+        {
+            "Sid": "AllowAmplifyToReadPrefix_<PLACEHOLDER>_staging_",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "amplify.amazonaws.com"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::<PLACEHOLDER_BUCKET>/*",
+            "Condition": {
+                "StringEquals": {
+                    "aws:SourceArn": "arn%3Aaws%3Aamplify%3A<PLACEHOLDER_REGION>%3A<PLACEHOLDER_ACCOUNT>%3Aapps%2F<PLACEHOLDER_APP>%2Fbranches%2Fstaging",
+                    "aws:SourceAccount": "<PLACEHOLDER_ACCOUNT>"
+                }
+            }
+        }
+    ]
+}
+
+  CORS:
+  [
+    {
+        "AllowedHeaders": [
+            "*"
+        ],
+        "AllowedMethods": [
+            "GET",
+            "PUT",
+            "POST",
+            "DELETE",
+            "HEAD"
+        ],
+        "AllowedOrigins": [
+            "*"
+        ],
+        "ExposeHeaders": [
+            "ETag",
+            "x-amz-meta-custom-header"
+        ],
+        "MaxAgeSeconds": 3000
+    }
+]
+
+
+
+
+
+\
+
+
+s3_private:
+  bucket_policy:
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::<PLACEHOLDER_ACCOUNT>:role/<PLACEHOLDER_ROLE>"
+            },
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::<PLACEHOLDER_BUCKET_PRIVATE>/*"
+        }
+    ]
+}
