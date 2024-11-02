@@ -35,3 +35,16 @@ The Lambda Function writes the labels and image metadata to the same shared Dyna
 The Lambda Function deletes the image from the S3 Bucket.
 The Lambda Function sends a notification with metadata to a notification service.
 The notification service sends an email notification to the author with the analysis results.
+
+
+Resources used:
+AWS Account
+DynamoDB Table
+S3 Buckets (Private and Public)
+AWS Lambda Functions (Private and Public)
+Amazon Rekognition
+SNS Topic
+AWS Amplify
+IAM Roles and Policies
+CORS Configuration
+Web Interface Design
