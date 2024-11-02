@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload to S3</title>
+    <link rel="stylesheet" href="website.css">
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1212.0.min.js"></script>
+</head>
+<body>
+    <h1>Upload an Image</h1>
+    <div class="upload-container">
+        <input type="file" id="imageInput" accept="image/*" required>
+        <button id="uploadButton">Upload</button>
+    </div>
+
+    <div id="result"></div>
+
+    <div class="recognition-container">
+        <div id="recognitionLabel">Recognition Results:</div>
+        <div id="recognitionResult"></div>
+    </div>
+
+    <script>
+        // AWS SDK configuration
+        AWS.config.update({
+            region: '<YOUR_REGION>',
+            credentials: new AWS.Credentials({
+                accessKeyId: '<YOUR_ACCESS_KEY_ID>',
+                secretAccessKey: '<YOUR_SECRET_ACCESS_KEY>'
+            })
+        });
+
+        const s3 = new AWS.S3();
+        const lambda = new AWS.Lambda();
+
+        document.getElementById('uploadButton').addEventListener('click', function() {
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Please select an image file.");
+                return;
+            }
+
+            const params = {
+                Bucket: '<YOUR_S3_BUCKET_NAME>',
+                Key: file.name,
+                Body: file,
+                ContentType: file.type
+            };
+
+            s3.upload(params, function(err, data) {
+                if (err) {
+                    console.log('Error uploading data: ', err);
+                    document.getElementById('result').innerHTML = 'Error uploading image.';
+                } else {
+                    console.log('Successfully uploaded file.', data);
+                    document.getElementById('result').innerHTML = 'Successfully uploaded image to S3: <span style="color: white;">' + data.Location + '</span>';
+                    invokeLambda(data.Key);
+                }
+            });
+        });
+
+        function invokeLambda(imageName) {
+            const lambdaParams = {
+                FunctionName: '<YOUR_LAMBDA_FUNCTION_NAME>',
+                InvocationType: 'RequestResponse',
+                Payload: JSON.stringify({ image_name: imageName })
+            };
+
+            lambda.invoke(lambdaParams, function(err, data) {
+                if (err) {
+                    console.error('Error invoking Lambda function: ', err);
+                    document.getElementById('recognitionResult').innerHTML = 'Error invoking Lambda function.';
+                } else {
+                    const result = JSON.parse(data.Payload);
+                    if (result.statusCode === 200) {
+                        const labels = JSON.parse(result.body).labels;
+                        document.getElementById('recognitionResult').innerHTML = 'Recognized Labels: <span style="color: white;">' + labels.join(', ') + '</span>';
+                    } else {
+                        document.getElementById('recognitionResult').innerHTML = 'Error: <span style="color: white;">' + JSON.parse(result.body).error + '</span>';
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
