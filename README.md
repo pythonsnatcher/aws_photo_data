@@ -12,8 +12,12 @@ The system is structured to maintain a clear distinction between private functio
 
 Both workflows store their analysis results in the same DynamoDB database, ensuring that all metadata is centralized and accessible, regardless of whether the images were uploaded through the public or private interface. This cohesive approach supports efficient data management and enhances the overall utility of the project.
 
+
+
+
 Workflows
-Public Workflow
+
+  Public Workflow
 
 Users upload an image via a web page hosted on Amplify, rather than through the AWS Console.
 The image is saved to a public S3 Bucket.
@@ -24,7 +28,8 @@ The analysis service returns labels to the Lambda Function.
 The Lambda Function writes the labels and image metadata to a shared DynamoDB database, ensuring centralized storage with data from the private workflow.
 The Lambda Function deletes the image from the S3 Bucket.
 The Lambda Function returns the labels to the user via the Amplify-hosted website.
-Private Workflow
+
+  Private Workflow
 
 Users upload images directly to a separate private S3 Bucket.
 A Lambda Function is triggered to analyze the latest uploaded file in the S3 Bucket.
@@ -38,13 +43,13 @@ The notification service sends an email notification to the author with the anal
 
 
 Resources used:
-AWS Account
-DynamoDB Table
-S3 Buckets (Private and Public)
-AWS Lambda Functions (Private and Public)
-Amazon Rekognition
-SNS Topic
-AWS Amplify
-IAM Roles and Policies
-CORS Configuration
-Web Interface Design
+AWS Account,
+DynamoDB Table,
+S3 Buckets (Private and Public),
+AWS Lambda Functions (Private and Public).
+Amazon Rekognition,
+SNS Topic,
+AWS Amplify,
+IAM Roles and Policies,
+CORS Configuration,
+Web Interface Design.
